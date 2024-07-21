@@ -1,4 +1,5 @@
-//$fn=100;
+//$fn=50;
+$fn=100;
 
 // 5.985 liters (7l bag)
 bag_x = 190;
@@ -6,7 +7,7 @@ bag_y = 140;
 bag_z = 225;
 
 
-r=0.5;
+r=1.5;
 center = true;
 thickness = 5;
 fitting_tollerance = 1.2;
@@ -30,14 +31,15 @@ top_part_offset_delta = 150; // [50:250]
 module minkowski_spehere() {
     minkowski() {
         children();
-        sphere(r);
+        cylinder(r=3);
+        //        sphere(r=2);
     }
 }
 
 // kontroll objekt
 module bag() {
     translate([0, 0, -10])
-    cube([bag_x, bag_y, bag_z], center);
+        cube([bag_x, bag_y, bag_z], center);
 }
 
 module base() {
@@ -53,7 +55,7 @@ module inlay(factor=1, z, tollerance=0) {
     y = (base_y-thickness*factor) - tollerance;
     //    translate([0, 0, z/2])
 
-    minkowski_spehere()
+    //    minkowski_spehere()
     cube([x, y, z], center);
 }
 
@@ -146,7 +148,7 @@ module funnel() {
                 cube([funnel_x, funnel_y, 1], true);
 
             translate([0, 0, 0])
-            top_inlay();
+                top_inlay();
 
         }
 
@@ -159,8 +161,8 @@ module funnel() {
             translate([0, 0, -1])
                 top_inlay(adapter_factor+3);
 
-//            translate([0, 0, 25])
-//                cube([funnel_x, funnel_y, 30], true);
+            //            translate([0, 0, 25])
+            //                cube([funnel_x, funnel_y, 30], true);
 
         }
     }
@@ -174,14 +176,18 @@ module funnel() {
                 // fitting lip
                 top_inlay_lip = 10;
                 translate([0, 0, top_inlay_z/2-top_inlay_lip/2])
+                    minkowski_spehere()
                     inlay(2, top_inlay_lip, fitting_tollerance);
 
                 // inner funnel
+
+                minkowski_spehere()
                 inlay(adapter_factor, top_inlay_z);
             }
 
             // hole
             translate([0, 0, 1])
+                minkowski_spehere()
                 inlay(adapter_factor+1, top_inlay_z+thickness+2);
 
         }
@@ -195,15 +201,17 @@ module funnel() {
 //#translate([0, 0, -6])
 //cube([100, 100, thickness], true);
 
-bottom();
+//import_stl("corner.stl");
 
-middle_part_offset = middle_z/2+middle_part_offset_delta;
-translate([0, 0, middle_part_offset ]) {
-//    #bag();
-    middle();
-}
+//bottom();
 
-// top
-top_part_offset = middle_part_offset + top_part_offset_delta;
-translate([0, 0, top_part_offset ])
-    funnel();
+//middle_part_offset = middle_z/2+middle_part_offset_delta;
+//translate([0, 0, middle_part_offset ]) {
+////    #bag();
+//    middle();
+//}
+//
+//// top
+//top_part_offset = middle_part_offset + top_part_offset_delta;
+//translate([0, 0, top_part_offset ])
+funnel();

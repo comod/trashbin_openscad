@@ -1,15 +1,22 @@
-//$fn=50;
-$fn=100;
+$fn=50;
+//$fn=100;
+//$fn=4;
+
+//use <roundedcube.scad>
 
 // 5.985 liters (7l bag)
 bag_x = 190;
 bag_y = 140;
 bag_z = 225;
 
-
-r=1.5;
+nozzle = 0.6;
+//r=0.5;
+//r=1.5;
+//r=1;
+r=nozzle*2;
+//r=4;
 center = true;
-thickness = 5;
+thickness = nozzle*6;
 fitting_tollerance = 1.2;
 
 bag_plus = 10;
@@ -31,8 +38,8 @@ top_part_offset_delta = 150; // [50:250]
 module minkowski_spehere() {
     minkowski() {
         children();
-        cylinder(r=3);
-        //        sphere(r=2);
+        cylinder(r=r);
+//           sphere(r);
     }
 }
 
@@ -111,26 +118,6 @@ module middle() {
         // hole
         minkowski_spehere()
         inlay(2, middle_z+offset);
-
-        //        // inlay cut out x
-        //        group() {
-        //            translate([0, 0, -115]) {
-        //                x = base_x - 10;
-        //                y = base_y + 1;
-        //                z = 15;
-        //                cube([x, y, z], center);
-        //            }
-        //        }
-        //
-        //        // inlay cut out y
-        //        group() {
-        //            translate([0, 0, -115]) {
-        //                x = base_x +1;
-        //                y = base_y - 10;
-        //                z = 15;
-        //                cube([x, y, z], center);
-        //            }
-        //        }
     }
 
 }
@@ -202,6 +189,7 @@ module funnel() {
 //cube([100, 100, thickness], true);
 
 //import_stl("corner.stl");
+//roundedcube([base_x, base_y, bag_z], center=true, radius=r);
 
 //bottom();
 

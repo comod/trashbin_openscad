@@ -13,10 +13,13 @@ nozzle = 0.6;
 //r=0.5;
 //r=1.5;
 //r=1;
-r=nozzle*2;
+thickness = nozzle*4;
+//thickness = nozzle*6;
+r=thickness;
+r2=r+thickness;
+r3=r2+thickness;
 //r=4;
 center = true;
-thickness = nozzle*6;
 fitting_tollerance = 1.2;
 
 bag_plus = 10;
@@ -35,7 +38,7 @@ top_inlay_z = 50;
 middle_part_offset_delta = 20; // [1:60]
 top_part_offset_delta = 150; // [50:250]
 
-module minkowski_spehere() {
+module minkowski_spehere(r) {
     minkowski() {
         children();
         cylinder(r=r);
@@ -51,32 +54,29 @@ module bag() {
 
 module base() {
     z = bottom_z;
-    minkowski_spehere()
+    minkowski_spehere(r3)
     cube([base_x, base_y, z], center);
 
 }
 
 module inlay(factor=1, z, tollerance=0) {
-    //    z = bottom_z;
     x = (base_x-thickness*factor) - tollerance;
     y = (base_y-thickness*factor) - tollerance;
-    //    translate([0, 0, z/2])
 
-    //    minkowski_spehere()
     cube([x, y, z], center);
 }
 
 module bottom_inlay(tollerance=0) {
-    translate([0, 0, thickness])
-        minkowski_spehere()
+    translate([0, 0, thickness*2])
+        minkowski_spehere(r2)
         inlay(1, bottom_z, tollerance);
 
 }
 
-module top_inlay(factor=1) {
+module top_inlay(factor=1, r=r) {
     //    translate([0, 0, 1])
 
-    minkowski_spehere()
+    minkowski_spehere(r)
     inlay(factor, top_inlay_z);
 }
 
@@ -105,25 +105,23 @@ module middle() {
 
     offset = (middle_z / 2) + bottom_z / 2;
 
-    //    honeycomb(middle_z, trashbin_diameter, hole_diameter, z_spacing, hex_radius, max_i, max_j, max_z)
     difference() {
         group() {
             translate([0, 0, -offset])
                 bottom_inlay(fitting_tollerance);
 
-            minkowski_spehere()
+            minkowski_spehere(r3)
             cube([base_x, base_y, middle_z], true);
         }
 
         // hole
-        minkowski_spehere()
-        inlay(2, middle_z+offset);
+        minkowski_spehere(r)
+        inlay(4, middle_z+offset);
     }
 
 }
 
 module funnel() {
-
     adapter_factor = 10;
 
     // funnel
@@ -131,25 +129,22 @@ module funnel() {
     difference() {
         hull() {
             translate([0, 0, funnel_z])
-                minkowski_spehere()
+                minkowski_spehere(r3)
                 cube([funnel_x, funnel_y, 1], true);
 
             translate([0, 0, 0])
-                top_inlay();
+                top_inlay(0, r3);
 
         }
 
         // hole
         hull() {
             translate([0, 0, funnel_z+1])
-                minkowski_spehere()
+                minkowski_spehere(r)
                 cube([funnel_x-thickness, funnel_y-thickness, 1], true);
 
             translate([0, 0, -1])
                 top_inlay(adapter_factor+3);
-
-            //            translate([0, 0, 25])
-            //                cube([funnel_x, funnel_y, 30], true);
 
         }
     }
@@ -163,18 +158,18 @@ module funnel() {
                 // fitting lip
                 top_inlay_lip = 10;
                 translate([0, 0, top_inlay_z/2-top_inlay_lip/2])
-                    minkowski_spehere()
-                    inlay(2, top_inlay_lip, fitting_tollerance);
+                    minkowski_spehere(r)
+                    inlay(4, top_inlay_lip, fitting_tollerance);
 
                 // inner funnel
 
-                minkowski_spehere()
+                minkowski_spehere(r2)
                 inlay(adapter_factor, top_inlay_z);
             }
 
             // hole
             translate([0, 0, 1])
-                minkowski_spehere()
+                minkowski_spehere(r)
                 inlay(adapter_factor+1, top_inlay_z+thickness+2);
 
         }
@@ -198,8 +193,8 @@ module funnel() {
 ////    #bag();
 //    middle();
 //}
-//
-//// top
+////
+////// top
 //top_part_offset = middle_part_offset + top_part_offset_delta;
 //translate([0, 0, top_part_offset ])
 funnel();
